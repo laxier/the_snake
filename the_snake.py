@@ -26,7 +26,7 @@ APPLE_COLOR = (255, 0, 0)
 SNAKE_COLOR = (0, 255, 0)
 
 # Скорость движения змейки:
-SPEED = 20
+SPEED = 10
 
 # Настройка игрового окна:
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
@@ -43,22 +43,22 @@ class Snake:
     """The snake."""
 
     def __init__(self) -> None:
-        self.body = [(randint(0,GRID_WIDTH), 
-                      randint(0,GRID_HEIGHT))]
+        self.body = [(GRID_WIDTH // 2, GRID_HEIGHT // 2)]
         self.color = SNAKE_COLOR
         self.direction = RIGHT
         self.next_direction = None
 
-    def update(self) -> None:
-        self.move()
+    def update(self, apple_location) -> bool:
+        new_apple = self.move(apple_location)
         self.draw()
+        return new_apple
     
     def pop(self) -> None:
         """Add a new segment at the end of the snake's body"""
         tail_x, tail_y = self.body[-1]
         self.body.append((tail_x, tail_y))
 
-    def move(self):
+    def move(self, apple_location) -> bool:
         if self.next_direction:
             self.direction = self.next_direction
             self.next_direction = None
@@ -70,15 +70,26 @@ class Snake:
             new_head[1] % GRID_HEIGHT
         )
 
+        if new_head == apple_location:
+            self.pop() 
+            return True
+        
+        # print(new_head, self.body)
+        if new_head in self.body:
+            print("collided")
+            self.body = [new_head]
+            return False
+
         self.body.insert(0, new_head)
         self.body.pop()
-
-
+        return False  
+    
     def draw(self) -> None:
         for segment in self.body:
             pygame.draw.rect(screen, self.color, (segment[0] * GRID_SIZE, 
                                                   segment[1] * GRID_SIZE, 
                                                   GRID_SIZE, GRID_SIZE))
+
 
 
 class Apple:
@@ -118,7 +129,9 @@ def handle_keys(game_object):
                 game_object.next_direction = LEFT
             elif event.key == pygame.K_RIGHT and game_object.direction != LEFT:
                 game_object.next_direction = RIGHT
-
+            elif event.key == pygame.K_ESCAPE:  # Проверка на нажатие Esc
+                pygame.quit()
+                raise SystemExit
 
 def main():
     pygame.init()
@@ -128,13 +141,20 @@ def main():
     clock = pygame.time.Clock()
     
     snake = Snake()
+    apple = Apple(snake.body)
 
     while True:
         handle_keys(snake)
         screen.fill(BOARD_BACKGROUND_COLOR)
-        snake.update()
+        
+        if snake.update(apple.location):
+            apple = Apple(snake.body)
+        
+        apple.update()
         pygame.display.flip()
-        clock.tick(10)
+        clock.tick(SPEED)
+    print("Game Over!")
+    pygame.quit()
 
 
 if __name__ == '__main__':
