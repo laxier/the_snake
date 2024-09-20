@@ -19,45 +19,25 @@ APPLE_COLOR = (255, 0, 0)
 SNAKE_COLOR = (0, 255, 0)
 
 # Скорость движения змейки
-SPEED = 10
+SPEED = 20
+
 
 class GameObject:
     """Базовый класс для игровых объектов."""
 
-    def __init__(self, position):
+    def __init__(self, position, color):
         """
         Инициализирует игровой объект.
 
         :param position: Начальная позиция объекта
+        :param color: Цвет объекта
         """
         self.position = position
-        self.body_color = None
+        self.color = color
 
     def draw(self, surface):
         """
-        Абстрактный метод для отрисовки объекта.
-
-        :param surface: Поверхность для отрисовки
-        """
-        pass
-
-
-class Apple(GameObject):
-    """Класс, представляющий яблоко в игре."""
-
-    def __init__(self):
-        """Инициализирует яблоко в случайной позиции."""
-        super().__init__(self.randomize_position())
-        self.body_color = APPLE_COLOR
-
-    def randomize_position(self):
-        """Устанавливает случайную позицию для яблока."""
-        return (random.randint(0, GRID_WIDTH - 1),
-                random.randint(0, GRID_HEIGHT - 1))
-
-    def draw(self, surface):
-        """
-        Отрисовывает яблоко на игровой поверхности.
+        Отрисовывает объект на игровой поверхности.
 
         :param surface: Поверхность для отрисовки
         """
@@ -66,7 +46,20 @@ class Apple(GameObject):
             self.position[1] * GRID_SIZE,
             GRID_SIZE, GRID_SIZE
         )
-        pygame.draw.rect(surface, self.body_color, rect)
+        pygame.draw.rect(surface, self.color, rect)
+
+
+class Apple(GameObject):
+    """Класс, представляющий яблоко в игре."""
+
+    def __init__(self):
+        """Инициализирует яблоко в случайной позиции."""
+        super().__init__(self.randomize_position(), APPLE_COLOR)
+
+    def randomize_position(self):
+        """Устанавливает случайную позицию для яблока."""
+        return (random.randint(0, GRID_WIDTH - 1),
+                random.randint(0, GRID_HEIGHT - 1))
 
 
 class Snake(GameObject):
@@ -74,8 +67,8 @@ class Snake(GameObject):
 
     def __init__(self):
         """Инициализирует змейку в начальном состоянии."""
-        super().__init__((GRID_WIDTH // 2, GRID_HEIGHT // 2))
-        self.body_color = SNAKE_COLOR
+        start_position = (GRID_WIDTH // 2, GRID_HEIGHT // 2)
+        super().__init__(start_position, SNAKE_COLOR)
         self.length = 1
         self.positions = [self.position]
         self.direction = RIGHT
@@ -102,7 +95,7 @@ class Snake(GameObject):
     def reset(self):
         """Сбрасывает змейку в начальное состояние."""
         self.length = 1
-        self.positions = [(GRID_WIDTH // 2, GRID_HEIGHT // 2)]
+        self.positions = [self.position]
         self.direction = RIGHT
         self.next_direction = None
 
@@ -113,12 +106,7 @@ class Snake(GameObject):
         :param surface: Поверхность для отрисовки
         """
         for position in self.positions:
-            rect = pygame.Rect(
-                position[0] * GRID_SIZE,
-                position[1] * GRID_SIZE,
-                GRID_SIZE, GRID_SIZE
-            )
-            pygame.draw.rect(surface, self.body_color, rect)
+            GameObject(position, self.color).draw(surface)
 
     def get_head_position(self):
         """Возвращает позицию головы змейки."""
