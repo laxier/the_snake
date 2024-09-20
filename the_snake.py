@@ -138,6 +138,7 @@ def handle_keys(snake):
 
 
 def main():
+    """Run the main game loop."""
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
     pygame.display.set_caption('Snake Game')
