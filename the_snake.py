@@ -20,7 +20,7 @@ APPLE_COLOR = (255, 0, 0)
 SNAKE_COLOR = (0, 255, 0)
 
 # Snake movement speed:
-SPEED = 10
+SPEED = 20
 
 # Game window setup:
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
