@@ -43,16 +43,42 @@ class Snake:
     """The snake."""
 
     def __init__(self) -> None:
-        self.body = [(randint(0,GRID_WIDTH), randint(0,GRID_HEIGHT))]
+        self.body = [(randint(0,GRID_WIDTH), 
+                      randint(0,GRID_HEIGHT))]
         self.color = SNAKE_COLOR
+        self.direction = RIGHT
+        self.next_direction = None
 
     def update(self) -> None:
+        self.move()
         self.draw()
+    
+    def pop(self) -> None:
+        """Add a new segment at the end of the snake's body"""
+        tail_x, tail_y = self.body[-1]
+        self.body.append((tail_x, tail_y))
+
+    def move(self):
+        if self.next_direction:
+            self.direction = self.next_direction
+            self.next_direction = None
+
+        head_x, head_y = self.body[0]
+        new_head = (head_x + self.direction[0], head_y + self.direction[1])
+        new_head = (
+            new_head[0] % GRID_WIDTH,
+            new_head[1] % GRID_HEIGHT
+        )
+
+        self.body.insert(0, new_head)
+        self.body.pop()
+
 
     def draw(self) -> None:
         for segment in self.body:
             pygame.draw.rect(screen, self.color, (segment[0] * GRID_SIZE, 
-                                                  segment[1] * GRID_SIZE, GRID_SIZE, GRID_SIZE))
+                                                  segment[1] * GRID_SIZE, 
+                                                  GRID_SIZE, GRID_SIZE))
 
 
 class Apple:
@@ -74,26 +100,41 @@ class Apple:
 
     def draw(self) -> None:
         pygame.draw.rect(screen, self.color, (self.location[0] * GRID_SIZE, 
-                                              self.location[1] * GRID_SIZE, GRID_SIZE, GRID_SIZE))
+                                              self.location[1] * GRID_SIZE, 
+                                              GRID_SIZE, GRID_SIZE))
 
+
+def handle_keys(game_object):
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            raise SystemExit
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP and game_object.direction != DOWN:
+                game_object.next_direction = UP
+            elif event.key == pygame.K_DOWN and game_object.direction != UP:
+                game_object.next_direction = DOWN
+            elif event.key == pygame.K_LEFT and game_object.direction != RIGHT:
+                game_object.next_direction = LEFT
+            elif event.key == pygame.K_RIGHT and game_object.direction != LEFT:
+                game_object.next_direction = RIGHT
 
 
 def main():
-    # Инициализация PyGame:
     pygame.init()
+    global screen
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    pygame.display.set_caption('Snake Game')
+    clock = pygame.time.Clock()
+    
     snake = Snake()
-    apple = Apple(snake.body)
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                return
 
-        clock.tick(SPEED)
+    while True:
+        handle_keys(snake)
         screen.fill(BOARD_BACKGROUND_COLOR)
         snake.update()
-        apple.update()
         pygame.display.flip()
+        clock.tick(10)
 
 
 if __name__ == '__main__':
