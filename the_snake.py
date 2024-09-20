@@ -1,5 +1,4 @@
 from random import choice, randint
-
 import pygame
 
 # Константы для размеров поля и сетки:
@@ -40,20 +39,61 @@ clock = pygame.time.Clock()
 
 
 # Тут опишите все классы игры.
-...
+class Snake:
+    """The snake."""
+
+    def __init__(self) -> None:
+        self.body = [(randint(0,GRID_WIDTH), randint(0,GRID_HEIGHT))]
+        self.color = SNAKE_COLOR
+
+    def update(self) -> None:
+        self.draw()
+
+    def draw(self) -> None:
+        for segment in self.body:
+            pygame.draw.rect(screen, self.color, (segment[0] * GRID_SIZE, 
+                                                  segment[1] * GRID_SIZE, GRID_SIZE, GRID_SIZE))
+
+
+class Apple:
+    """The apple."""
+
+    def __init__(self, snake_body) -> None:
+        self.location = self.spawn_apple(snake_body)
+        self.color = APPLE_COLOR
+    
+    def spawn_apple(self, snake_body):
+        while True:
+            x = randint(0, GRID_WIDTH - 1)
+            y = randint(0, GRID_HEIGHT - 1)
+            if (x, y) not in snake_body:
+                return (x, y)
+            
+    def update(self) -> None:
+        self.draw()
+
+    def draw(self) -> None:
+        pygame.draw.rect(screen, self.color, (self.location[0] * GRID_SIZE, 
+                                              self.location[1] * GRID_SIZE, GRID_SIZE, GRID_SIZE))
+
 
 
 def main():
     # Инициализация PyGame:
     pygame.init()
-    # Тут нужно создать экземпляры классов.
-    ...
+    snake = Snake()
+    apple = Apple(snake.body)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
 
-    # while True:
-    #     clock.tick(SPEED)
-
-        # Тут опишите основную логику игры.
-        # ...
+        clock.tick(SPEED)
+        screen.fill(BOARD_BACKGROUND_COLOR)
+        snake.update()
+        apple.update()
+        pygame.display.flip()
 
 
 if __name__ == '__main__':
