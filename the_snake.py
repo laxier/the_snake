@@ -21,6 +21,10 @@ SNAKE_COLOR = (0, 255, 0)
 # Скорость движения змейки
 SPEED = 20
 
+pygame.init()
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
+pygame.display.set_caption('Snake Game')
+clock = pygame.time.Clock()
 
 class GameObject:
     """Базовый класс для игровых объектов."""
@@ -33,7 +37,7 @@ class GameObject:
         :param color: Цвет объекта
         """
         self.position = position
-        self.color = color
+        self.body_color = color
 
     def draw(self, surface):
         """
@@ -46,7 +50,7 @@ class GameObject:
             self.position[1] * GRID_SIZE,
             GRID_SIZE, GRID_SIZE
         )
-        pygame.draw.rect(surface, self.color, rect)
+        pygame.draw.rect(surface, self.body_color, rect)
 
 
 class Apple(GameObject):
@@ -106,7 +110,7 @@ class Snake(GameObject):
         :param surface: Поверхность для отрисовки
         """
         for position in self.positions:
-            GameObject(position, self.color).draw(surface)
+            GameObject(position, self.body_color).draw(surface)
 
     def get_head_position(self):
         """Возвращает позицию головы змейки."""
@@ -139,11 +143,7 @@ def handle_keys(snake):
 
 def main():
     """Run the main game loop."""
-    pygame.init()
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
-    pygame.display.set_caption('Snake Game')
-    clock = pygame.time.Clock()
-
+    
     snake = Snake()
     apple = Apple()
 
