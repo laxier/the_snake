@@ -26,6 +26,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
 pygame.display.set_caption('Snake Game')
 clock = pygame.time.Clock()
 
+
 class GameObject:
     """Базовый класс для игровых объектов."""
 
@@ -143,7 +144,6 @@ def handle_keys(snake):
 
 def main():
     """Run the main game loop."""
-    
     snake = Snake()
     apple = Apple()
 
